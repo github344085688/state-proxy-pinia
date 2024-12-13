@@ -1,0 +1,56 @@
+{
+  "name": "state-proxy-pinia",
+  "version": "0.0.1",
+  "description": "state-proxy-pinia",
+  "license": "Apache-2.0",
+  "homepage": " ",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "main": "./dist/state-proxy-pinia.cjs.js",
+  "module": "./dist/state-proxy-pinia.es.js",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/state-proxy-pinia.cjs.js",
+      "require": "./dist/state-proxy-pinia.es.js"
+    }
+  },
+  "browser": {
+    ".": "./dist/state-proxy-pinia.es.js"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "vite build  ",
+    "test": "vue-tsc --noEmit",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "pinia": "^2.3.0",
+    "pinia-plugin-persistedstate": "^4.1.3",
+    "vue": "^3.4.38"
+  },
+  "keywords": [
+    "vue3",
+    "vite",
+    "typescript",
+    "pinia"
+  ],
+  "author": "Andrew Melad",
+  "devDependencies": {
+    "@babel/types": "^7.25.4",
+    "@types/node": "^22.5.1",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "@vue/tsconfig": "^0.5.1",
+    "rollup-plugin-typescript2": "^0.33.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2",
+    "vite-plugin-copy": "^0.1.6",
+    "vite-plugin-css-injected-by-js": "^3.5.1",
+    "vite-plugin-dts": "^4.0.3",
+    "vue-tsc": "^2.0.29"
+  }
+}
