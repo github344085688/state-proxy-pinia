@@ -4,7 +4,7 @@ import {reactive, type Ref, ref} from 'vue'
 export const userStore = defineStore(
   'user',
   () => {
-    const token: Ref<string | undefined, string> = ref<string>()
+      const token: Ref<string> = ref('')
     const user = reactive({} );
     return {
       token,

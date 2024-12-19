@@ -1,3 +1,8 @@
 import pinia from '@/stores/piniaConfig'
 export default pinia;
-export {default as globalState} from '@/stores/globalState'
+import {status} from '@/stores/status'
+import {userStore} from '@/stores/user'
+export {
+    status,
+    userStore
+}

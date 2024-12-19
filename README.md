@@ -5,19 +5,18 @@
 This component is a dynamic, It is built with **Vue 3**, **Vite**, **TypeScript**,**pinia**, and **TypeScript**. Permanent storage  
  
 ```bash
-npm install v-table-system
+npm install juejin-state
 ```
  
 ## in Vue main.ts:
 
 ```bash
-import App from "./App.vue";
-import pinia,{globalState} from 'state-proxy-pinia'
-const app: any = createApp(App);
+import pinia,{status} from 'juein-state'
 app.use(pinia);
-const state = globalState();
+const state = status();
 app.provide("globalState", state.state );
 app.mount("#app");
+
 ```
 
 ## in Vue Script:

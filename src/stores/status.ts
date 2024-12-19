@@ -1,8 +1,8 @@
 import {defineStore} from 'pinia'
-import {ref,reactive} from 'vue'
+import {reactive} from 'vue'
 export const status = defineStore(
     'status',
-    (item:any) => {
+    () => {
       const state = reactive({} );
         return {
             state

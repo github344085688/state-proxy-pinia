@@ -16,8 +16,8 @@ export default defineConfig({
           declarationMap: false,
           outDir: "dist",
         },
-        "include": ["src/index.ts"], // 只包含你的入口文件
-        "exclude": ["node_modules","src/**/*", "**/*.test.ts", "**/*.spec.ts"] // 排除所有文件，除了 src/index.ts
+        include: ["src/index.ts"],
+        exclude: ["node_modules", "**/*.test.ts", "**/*.spec.ts"] // 排除测试文件
       }
     }),
   ],
@@ -27,7 +27,7 @@ export default defineConfig({
       entry: "./src/index.ts",
       formats: ["es", "cjs"],
       name: "StateProxyPinia",
-      fileName: (format) => `state-proxy-pinia.${format}.js`,
+      fileName: (format) => `juejin-state.${format}.js`,
     },
     rollupOptions: {
       external: ["vue"],
