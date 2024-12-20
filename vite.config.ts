@@ -1,13 +1,10 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import typescript2 from "rollup-plugin-typescript2";
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 import { resolve } from "path";
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    cssInjectedByJsPlugin(),
     typescript2({
       check: false,
       tsconfigOverride: {
@@ -30,11 +27,12 @@ export default defineConfig({
       fileName: (format) => `juejin-state.${format}.js`,
     },
     rollupOptions: {
-      external: ["vue"],
+      external: ["vue","uni"],
       output: {
         exports: "named",
         globals: {
           vue: "Vue",
+          uni: "uni"
         },
       },
     },

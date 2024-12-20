@@ -1,6 +1,6 @@
 {
   "name": "juejin-state",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "juejin-state",
   "license": "MIT",
   "homepage": " ",
@@ -42,7 +42,7 @@
     "@vue/tsconfig": "^0.5.1",
     "rollup-plugin-typescript2": "^0.33.0",
     "typescript": "^5.5.4",
-    "vite": "^4.3.5",
+    "vite": "^5.0.0",
     "vite-plugin-copy": "^0.1.6",
     "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.0.3"
