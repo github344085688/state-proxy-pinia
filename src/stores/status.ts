@@ -16,6 +16,7 @@ export const status = defineStore(
                     uniStorage.set(key, value)
                 },
                 getItem(key) {
+
                     return uniStorage.get(key)
                 },
             },

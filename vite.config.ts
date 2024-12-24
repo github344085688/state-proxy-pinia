@@ -13,7 +13,7 @@ export default defineConfig({
           declarationMap: false,
           outDir: "dist",
         },
-        include: ["src/index.ts"],
+        include: ["/src/index.ts"],
         exclude: ["node_modules", "**/*.test.ts", "**/*.spec.ts"] // 排除测试文件
       }
     }),
@@ -23,7 +23,7 @@ export default defineConfig({
     lib: {
       entry: "./src/index.ts",
       formats: ["es", "cjs"],
-      name: "StateProxyPinia",
+      name: "juejin-state",
       fileName: (format) => `juejin-state.${format}.js`,
     },
     rollupOptions: {

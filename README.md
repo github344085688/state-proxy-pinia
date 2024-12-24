@@ -1,4 +1,4 @@
-# state-proxy-pinia
+# juejin-state
 
 ## Overview
 
@@ -11,7 +11,7 @@ npm install juejin-state
 ## in Vue main.ts:
 
 ```bash
-import pinia,{status} from 'juein-state'
+import pinia,{status} from 'juejin-state'
 app.use(pinia);
 const state = status();
 app.provide("globalState", state.state );

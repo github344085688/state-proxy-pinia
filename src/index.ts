@@ -1,8 +1,4 @@
 import pinia from '@/stores/piniaConfig'
 export default pinia;
-import {status} from '@/stores/status'
-import {userStore} from '@/stores/user'
-export {
-    status,
-    userStore
-}
+export {status} from '@/stores/status'
+export {userStore} from '@/stores/user' 

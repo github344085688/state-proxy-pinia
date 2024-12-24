@@ -1,6 +1,3 @@
-/**
- * uniStorage 模块，封装 UniApp 的本地存储 API。
- */
 
 const uniStorage = {
   /**
@@ -9,7 +6,9 @@ const uniStorage = {
    * @param value 缓存值
    */
   set(key: string, value: any): void {
-    uni.setStorageSync(key, value)
+    if (typeof uni !== 'undefined') uni.setStorageSync(key, value)
+    else localStorage.setItem(key,  value )
+
   },
 
   /**
@@ -18,7 +17,10 @@ const uniStorage = {
    * @returns 缓存值
    */
   get(key: string): any {
-    return uni.getStorageSync(key)
+    // alert('1')
+    if (typeof uni !== 'undefined')  return uni.getStorageSync(key)
+    else return localStorage.getItem(key)
+
   },
 
   /**
@@ -26,14 +28,18 @@ const uniStorage = {
    * @param key 缓存键
    */
   delete(key: string): void {
-    uni.removeStorageSync(key)
+    if (typeof uni !== 'undefined') uni.removeStorageSync(key)
+    else return localStorage.removeItem( key)
+
   },
 
   /**
    * 移除全部永久缓存
    */
   clear(): void {
-    uni.clearStorageSync()
+    if (typeof uni !== 'undefined')  uni.clearStorageSync()
+    else return localStorage.clear()
+
   },
 }
 
