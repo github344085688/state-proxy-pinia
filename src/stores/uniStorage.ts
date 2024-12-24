@@ -1,4 +1,4 @@
-
+declare const uni: any;
 const uniStorage = {
   /**
    * 设置永久缓存

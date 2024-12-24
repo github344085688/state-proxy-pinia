@@ -11,13 +11,21 @@ npm install juejin-state
 ## in Vue main.ts:
 
 ```bash
-import pinia,{status} from 'juejin-state'
+ 
+
+ 
+import pinia,{status,userStore,accessEnvironmentalState} from 'juejin-state'
+ 
 app.use(pinia);
 const state = status();
 app.provide("globalState", state.state );
+accessEnvironmentalState( state.state);
 app.mount("#app");
 
 ```
+*  accessEnvironmentalState()  获取环境变量状态
+*  userStore:{   token: "",   user: {}   } 用户信息存储
+*  status{   status:{UNI_PLATFORM:"h5",VUE_APP_ENV:"dev"}   } 状态管理
 
 ## in Vue Script:
 
@@ -34,6 +42,9 @@ app.mount("#app");
 <script setup lang="ts"> 
 import {onMounted,inject} from "vue";
 const glstate:any = inject("globalState"); 
+onMounted(() => {
+  glstate.variable =0 // 
+});
 </script>
 
 ```
