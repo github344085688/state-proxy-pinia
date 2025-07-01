@@ -11,7 +11,7 @@ export default defineConfig({
         compilerOptions: {
           declaration: true, // 确保生成 .d.ts 文件
           declarationMap: false,
-          outDir: "F:/aoleiShiCAI/node_modules/juejin-state/dist",
+          outDir: "dist",
         },
         include: ["/src/index.ts"],
         exclude: ["node_modules", "**/*.test.ts", "**/*.spec.ts"] // 排除测试文件
@@ -20,7 +20,6 @@ export default defineConfig({
   ],
   build: {
     cssCodeSplit: false,
-    outDir: "F:/aoleiShiCAI/node_modules/juejin-state/dist",
     lib: {
       entry: "./src/index.ts",
       formats: ["es", "cjs"],
