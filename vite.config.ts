@@ -19,6 +19,7 @@ export default defineConfig({
     }),
   ],
   build: {
+    outDir: "F:\\aoleiShiCAI\\node_modules\\juejin-state\\dist",
     cssCodeSplit: false,
     lib: {
       entry: "./src/index.ts",
