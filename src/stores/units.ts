@@ -29,9 +29,15 @@ interface EnvironmentalState {
   TAB_BAR_HEIGHT_WITH_INDICATOR?: number; // TabBar高度+主屏幕指示器 rpx
   TAB_BAR_ALL_HEIGHT?: number; // TabBar总高度（包含主屏幕指示器）rpx
   HAS_HOME_INDICATOR?: boolean; // 是否有主屏幕指示器（iPhone X及以上）
+  HOME_INDICATOR_HEIGHT?: number; // 主屏幕指示器/额外底部空间 rpx
+  HOME_INDICATOR_HEIGHT_PX?: number; // 主屏幕指示器/额外底部空间 px
   menuButtonInfo?: any; // 微信小程序菜单按钮信息
   IOSHEIGHT?: number; // iOS导航栏高度
   xitType?: any; // 系统类型  
+  SYSTEM_LANGUAGE?: string; // 系统语言
+  SYSTEM_THEME?: string; // 系统主题（light/dark）
+  model?: string; // 系统主题（light/dark）
+  eventStage?: boolean; // 系统主题（light/dark）
 }
 
 /**
@@ -145,6 +151,11 @@ function calculateLayoutHeights(state: EnvironmentalState): void {
     state.SCREEN_HEIGHT = systemInfo.screenHeight || systemInfo.windowHeight || 0;
     state.SCREEN_WIDTH_RPX = state.SCREEN_WIDTH * Ratio;
     state.SCREEN_HEIGHT_RPX = state.SCREEN_HEIGHT * Ratio;
+    state.eventStage = true;
+    
+    // 设置系统语言和主题
+    state.SYSTEM_LANGUAGE = systemInfo.language || 'zh_CN'; // 系统语言，默认中文
+    state.SYSTEM_THEME = systemInfo.theme || 'light'; // 系统主题，默认浅色
     
     // 获取状态栏高度
     const statusBarHeightPx = systemInfo.statusBarHeight || PLATFORM_CONFIG.DEFAULT_STATUS_BAR_HEIGHT;
@@ -221,7 +232,7 @@ function setH5Layout(state: EnvironmentalState): void {
     state.MENU_T =  0; // 菜单按钮距离顶部的距离（rpx）
     state.MENU_R = 0; // 菜单按钮距离右边的距离（rpx）
     state.MENU_L = 0; // 菜单按钮距离左边的距离（rpx），H5平台下设为0
-    state.MENU_H = 0; // 菜单按钮的高度（rpx）
+    state.MENU_H = 60; // 菜单按钮的高度（rpx）
     state.MENU_W = 0; // 菜单按钮的宽度（rpx）
     
     // H5平台TabBar参数
@@ -230,10 +241,36 @@ function setH5Layout(state: EnvironmentalState): void {
     state.TAB_BAR_HEIGHT_WITH_INDICATOR = 100; // TabBar高度+指示器 rpx
     state.TAB_BAR_ALL_HEIGHT = state.TAB_BAR_HEIGHT; // TabBar总高度 rpx
     state.HAS_HOME_INDICATOR = false; // H5没有主屏幕指示器
+    state.HOME_INDICATOR_HEIGHT_PX = 0;
+    state.HOME_INDICATOR_HEIGHT = 0;
   } catch {
     // 异常时使用回退配置
     setFallbackLayout(state);
   }
+}
+
+/**
+ * 归一化胶囊（菜单按钮）尺寸，避免异常值影响布局
+ */
+function normalizeCapsule(info: any): any {
+  if (!info) return info;
+  const normalized = { ...info };
+  if (typeof normalized.height === 'number') {
+    normalized.height = Math.min(Math.max(normalized.height, 28), 44);
+  }
+  if (typeof normalized.width === 'number') {
+    normalized.width = Math.min(Math.max(normalized.width, 70), 120);
+  }
+  return normalized;
+}
+
+/**
+ * 检测是否为 iPad/平板设备
+ * 尝试使用多种字段进行识别，兼容不同平台返回差异
+ */
+function isPadDevice(systemInfo: any): boolean {
+  const width = systemInfo.screenWidth || systemInfo.windowWidth || 0;
+  return width > 480;
 }
 
 /**
@@ -246,8 +283,9 @@ function setH5Layout(state: EnvironmentalState): void {
  * @returns 导航栏高度 px
  */
 function handleWeChatMiniProgram(state: EnvironmentalState, systemInfo: any, Ratio: number, statusBarHeightPx: number): number {
-  const menuButtonInfo = uni.getMenuButtonBoundingClientRect?.(); // 获取菜单按钮边界信息
-  
+  const rawMenuButtonInfo = uni.getMenuButtonBoundingClientRect?.(); // 获取菜单按钮边界信息
+  const menuButtonInfo = normalizeCapsule(rawMenuButtonInfo); // 归一化
+
   if (menuButtonInfo) {
     // 设置菜单按钮位置和尺寸信息（转换为rpx）
     state.MENU_T = menuButtonInfo.top * Ratio; // 菜单按钮顶部距离
@@ -296,6 +334,15 @@ function handleWeChatMiniProgram(state: EnvironmentalState, systemInfo: any, Rat
     
     // TAB_BAR_ALL_HEIGHT: TabBar总高度（包含主屏幕指示器，如果有的话）
     state.TAB_BAR_ALL_HEIGHT = tabBarWithIndicatorPx * Ratio;
+
+    if (state.SCREEN_WIDTH > 480) {
+      state.model = 'ipad';
+      state.HAS_HOME_INDICATOR = false;
+      state.TAB_BAR_HEIGHT_PX = 88;
+      state.TAB_BAR_HEIGHT = 88;
+      state.TAB_BAR_HEIGHT_WITH_INDICATOR = 88;
+      state.TAB_BAR_ALL_HEIGHT = 88;
+    }
     
     // 计算导航栏高度：基于菜单按钮位置计算
     if (menuButtonInfo.top && menuButtonInfo.height) {
@@ -333,6 +380,12 @@ function handleOtherPlatforms(state: EnvironmentalState, systemInfo: any, Ratio:
     setDefaultMenuLayout(state, (statusBarHeightPx + navigationHeightPx) * Ratio, 88 * Ratio);
     state.MENU_R = 24 * Ratio; // Android菜单按钮右边距
     state.MENU_L = 24 * Ratio; // Android菜单按钮左边距
+  } else if (platform === 'harmony') {
+    // HarmonyOS 导航栏优化
+    navigationHeightPx = PLATFORM_CONFIG.DEFAULT_NAVIGATION_HEIGHT.HARMONY;
+    setDefaultMenuLayout(state, (statusBarHeightPx + navigationHeightPx) * Ratio, 64.1711229946524 * Ratio);
+    state.MENU_R = 24 * Ratio;
+    state.MENU_L = 24 * Ratio;
   } else {
     // 其他平台默认配置
     navigationHeightPx = PLATFORM_CONFIG.DEFAULT_NAVIGATION_HEIGHT.DEFAULT;
@@ -364,9 +417,17 @@ function setDefaultMenuLayout(state: EnvironmentalState, menuT: number = 24, men
  * @returns 是否有主屏幕指示器
  */
 function checkHasHomeIndicator(systemInfo: any): boolean {
-  console.log('systemInfo',systemInfo) // 调试日志
+  // console.log('systemInfo',systemInfo) // 调试日志
   const screenHeight = systemInfo.screenHeight || systemInfo.windowHeight; // 屏幕高度
   const statusBarHeight = systemInfo.statusBarHeight || 0; // 状态栏高度
+
+  // 优先使用 safeArea 底部差值来判断（存在明显底部安全区说明有指示器）
+  if (systemInfo.safeArea && typeof systemInfo.safeArea.bottom === 'number' && typeof screenHeight === 'number') {
+    const indicatorSpace = screenHeight - systemInfo.safeArea.bottom;
+    if (indicatorSpace >= 16) {
+      return true;
+    }
+  }
   
   // iOS设备检测逻辑
   if (systemInfo.osName === 'ios') {
@@ -391,56 +452,50 @@ function checkHasHomeIndicator(systemInfo: any): boolean {
  * @param Ratio rpx转换比例
  */
 function calculateTabBarHeight(state: EnvironmentalState, systemInfo: any, Ratio: number): void {
-  const platform = process.env.UNI_PLATFORM; // 获取当前平台
-  let tabBarHeightPx = PLATFORM_CONFIG.DEFAULT_TAB_BAR_HEIGHT.DEFAULT; // 默认TabBar高度
-  let hasHomeIndicator = false; // 是否有主屏幕指示器
-  
-  // 在微信小程序和App平台中都需要区分系统类型
+  const platform = process.env.UNI_PLATFORM;
+  let tabBarHeightPx = PLATFORM_CONFIG.DEFAULT_TAB_BAR_HEIGHT.DEFAULT;
+  let hasHomeIndicator = false;
+  let extraBottomPx = 0;
+
+  if (state.SCREEN_WIDTH > 480) {
+    state.model = 'ipad';
+    state.HAS_HOME_INDICATOR = false;
+    state.TAB_BAR_HEIGHT_PX = 88;
+    state.TAB_BAR_HEIGHT = 88;
+    state.TAB_BAR_HEIGHT_WITH_INDICATOR = 88;
+    state.TAB_BAR_ALL_HEIGHT = 88;
+    state.HOME_INDICATOR_HEIGHT_PX = 0;
+    state.HOME_INDICATOR_HEIGHT = 0;
+    return;
+  }
+
   if (platform === 'mp-weixin' || ['app', 'ios', 'android'].includes(platform)) {
-    const systemPlatform = systemInfo.osName || systemInfo.osName; // 获取系统平台
-    
+    const systemPlatform = systemInfo.osName || systemInfo.osName;
+
     if (systemPlatform === 'ios') {
-      // iOS系统：检测主屏幕指示器并设置TabBar高度
       hasHomeIndicator = checkHasHomeIndicator(systemInfo);
       tabBarHeightPx = PLATFORM_CONFIG.DEFAULT_TAB_BAR_HEIGHT.IOS;
+      extraBottomPx = hasHomeIndicator ? PLATFORM_CONFIG.HOME_INDICATOR_HEIGHT : 0;
     } else if (systemPlatform === 'android') {
-      // Android系统：通常没有主屏幕指示器
       hasHomeIndicator = false;
       tabBarHeightPx = PLATFORM_CONFIG.DEFAULT_TAB_BAR_HEIGHT.ANDROID;
+      extraBottomPx = 10;
     } else if (systemPlatform === 'harmony' || systemInfo.osName === 'harmony') {
-      // 鸿蒙系统：检测主屏幕指示器并设置TabBar高度
       hasHomeIndicator = checkHasHomeIndicator(systemInfo);
       tabBarHeightPx = PLATFORM_CONFIG.DEFAULT_TAB_BAR_HEIGHT.HARMONY;
+      extraBottomPx = 10;
     }
   }
-  
-  // 设置相关状态
-  state.HAS_HOME_INDICATOR = hasHomeIndicator; // 是否有主屏幕指示器
-  state.TAB_BAR_HEIGHT_PX = tabBarHeightPx; // TabBar高度 px
-  
-  // TabBar基础高度（不包含主屏幕指示器）
-  const tabBarOnlyPx = hasHomeIndicator 
-    ? tabBarHeightPx 
-    : tabBarHeightPx;
-  
-  // TAB_BAR_HEIGHT: 仅TabBar的高度（rpx）
+
+  const tabBarOnlyPx = tabBarHeightPx;
+  const tabBarWithExtraPx = tabBarHeightPx + extraBottomPx;
+  state.HAS_HOME_INDICATOR = hasHomeIndicator;
+  state.HOME_INDICATOR_HEIGHT_PX = extraBottomPx;
+  state.HOME_INDICATOR_HEIGHT = extraBottomPx * Ratio;
+  state.TAB_BAR_HEIGHT_PX = tabBarOnlyPx;
   state.TAB_BAR_HEIGHT = tabBarOnlyPx * Ratio;
-  
-  // TAB_BAR_HEIGHT_WITH_INDICATOR: TabBar高度 + 主屏幕指示器高度（如果有）
-  const tabBarWithIndicatorPx = hasHomeIndicator 
-    ? tabBarHeightPx + PLATFORM_CONFIG.HOME_INDICATOR_HEIGHT
-    : tabBarHeightPx;
-    
-  // 开发环境调试日志（发布时可移除）
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[DEBUG] Home Indicator状态:', {
-      hasHomeIndicator, // 是否有主屏幕指示器
-      screenHeight: systemInfo.screenHeight, // 屏幕高度
-      statusBarHeight: systemInfo.statusBarHeight, // 状态栏高度
-      tabBarHeightPx, // TabBar高度 px
-      finalHeight: tabBarWithIndicatorPx * Ratio // 最终高度 rpx
-    });
-  }
+  state.TAB_BAR_HEIGHT_WITH_INDICATOR = tabBarWithExtraPx * Ratio;
+  state.TAB_BAR_ALL_HEIGHT = tabBarWithExtraPx * Ratio;
 }
 
 /**
@@ -474,4 +529,6 @@ function setFallbackLayout(state: EnvironmentalState): void {
   state.TAB_BAR_HEIGHT_WITH_INDICATOR = state.TAB_BAR_HEIGHT; // TabBar高度+指示器 rpx
   state.TAB_BAR_ALL_HEIGHT = state.TAB_BAR_HEIGHT; // TabBar总高度 rpx
   state.HAS_HOME_INDICATOR = false; // 回退配置下默认没有主屏幕指示器
+  state.HOME_INDICATOR_HEIGHT_PX = 0;
+  state.HOME_INDICATOR_HEIGHT = 0;
 }

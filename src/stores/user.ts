@@ -19,6 +19,7 @@ interface UserInfo {
 // 定义store状态类型
 interface UserState {
     token: string;
+    openid: string;
     navStage: string;
     role: string;
     user: UserInfo | null;
@@ -31,13 +32,20 @@ export const userStore = defineStore(
         const token = ref<string>('');
         const navStage = ref<string>('');
         const role = ref<string>('');
+        const openid = ref<string>('');
         const user = ref<UserInfo | null>(null);
-          
+        const store = ref({});
+        const userInfor = ref({});
+        const language = ref<string>('');          
         return { 
             token,
             navStage,
+            openid,
             role,
-            user 
+            user,
+            store,
+            userInfor,
+            language
         }
     },
     {
@@ -47,11 +55,10 @@ export const userStore = defineStore(
                     uniStorage.set(key, value)
                 },
                 getItem(key) {
-
                     return uniStorage.get(key)
                 },
             },
-            paths: ['token', 'navStage', 'role', 'user'],
+            paths: ['token', 'navStage', 'role', 'user','store','userInfor','language','openid'],
         },
     },
 )

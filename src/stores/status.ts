@@ -5,8 +5,10 @@ export const status = defineStore(
     'status',
     () => {
         const state = reactive({} );
+        const envenStatus = reactive({} );
         return {
-            state
+            state,
+            envenStatus
         }
     },
     {
@@ -16,11 +18,10 @@ export const status = defineStore(
                     uniStorage.set(key, value)
                 },
                 getItem(key) {
-
                     return uniStorage.get(key)
                 },
             },
-            paths: ['state'],
+            paths: ['state','envenStatus'],
         },
     },
 )
